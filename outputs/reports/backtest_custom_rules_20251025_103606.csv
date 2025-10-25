@@ -1,0 +1,7 @@
+Regla,Tipo,Disparos_Train,Win_Rate_Train,ROI_Train,Disparos_Test,Win_Rate_Test,ROI_Test,P_Value,Significativo
+Under25_Si_0-0_HT,Under 2.5,2080,54.18269230769231,2.9471153846153717,580,52.41379310344828,-0.41379310344827197,0.13111093719252956,False
+Favorito_Mantiene_Ventaja,Favorito,0,0.0,0.0,0,0.0,0.0,1.0,False
+Ganando_1-0_HT_No_Pierde,Doble Chance (ganador HT),0,0.0,0.0,0,0.0,0.0,1.0,False
+Gol_2H_Equipos_Grandes,Gol en 2H,870,92.87356321839081,76.4597701149425,230,96.08695652173913,82.56521739130433,2.558255145291621e-54,False
+Gol_2H_Si_Gol_1H,Gol en 2H,0,0.0,0.0,0,0.0,0.0,1.0,False
+Over25_Si_2Goles_HT,Over 2.5,0,0.0,0.0,0,0.0,0.0,1.0,False
