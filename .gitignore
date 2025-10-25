@@ -1,0 +1,31 @@
+# Variables de entorno (credenciales)
+.env
+
+# Datos
+data/raw/*.csv
+data/processed/*.parquet
+data/splits/*.parquet
+data/proximos/*.json
+
+# Logs
+outputs/logs/*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

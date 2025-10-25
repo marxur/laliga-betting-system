@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Alertas La Liga - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚽ Sistema de Alertas La Liga</h1>
+            <p class="subtitle">Dashboard de Control</p>
+        </header>
+
+        <nav>
+            <a href="/" class="active">Dashboard</a>
+            <a href="/configurar">⚙️ Configuración</a>
+            <a href="/resultados">📊 Resultados Backtest</a>
+        </nav>
+
+        <div class="status-cards">
+            <div class="card">
+                <h3>📧 Email</h3>
+                <p class="email">marcosvalenciagarcia@gmail.com</p>
+                <span class="status {% if estado.email_configurado %}status-ok{% else %}status-pending{% endif %}">
+                    {% if estado.email_configurado %}✓ Configurado{% else %}⚠ Pendiente{% endif %}
+                </span>
+            </div>
+
+            <div class="card">
+                <h3>🔑 API-Sports</h3>
+                <p>Datos en tiempo real</p>
+                <span class="status {% if estado.api_configurada %}status-ok{% else %}status-pending{% endif %}">
+                    {% if estado.api_configurada %}✓ Configurada{% else %}⚠ Pendiente{% endif %}
+                </span>
+            </div>
+
+            <div class="card">
+                <h3>📊 Última Ejecución</h3>
+                <p>{{ estado.ultima_ejecucion or 'Nunca ejecutado' }}</p>
+                <span class="status status-info">{{ estado.alertas_generadas|length }} alertas</span>
+            </div>
+        </div>
+
+        <div class="actions">
+            <h2>Acciones Rápidas</h2>
+            
+            <button onclick="testAPIs()" class="btn btn-secondary">
+                🔍 Probar Conexión APIs
+            </button>
+            
+            <button onclick="verProximosPartidos()" class="btn btn-secondary">
+                📅 Ver Próximos Partidos
+            </button>
+            
+            <button onclick="evaluarPartidos()" class="btn btn-primary">
+                🎯 Evaluar Partidos Ahora
+            </button>
+        </div>
+
+        <div id="resultado" class="resultado" style="display: none;"></div>
+
+        <div class="info-box">
+            <h3>ℹ️ Información del Sistema</h3>
+            <ul>
+                <li><strong>Reglas Activas:</strong> 3 (Local_Invicto_Favorito, Favorito_Local_Forma, Visitante_Invicto)</li>
+                <li><strong>ROI Esperado:</strong> ~9.5% anual</li>
+                <li><strong>Fuentes de Datos:</strong> API-Sports.io + TheSportsDB (fallback)</li>
+                <li><strong>Frecuencia de Alertas:</strong> Cada 24 horas</li>
+            </ul>
+        </div>
+
+        <div class="reglas-box">
+            <h3>📋 Reglas Validadas</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Regla</th>
+                        <th>Win Rate</th>
+                        <th>ROI</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Local_Invicto_Favorito</td>
+                        <td>80.7%</td>
+                        <td>+5.1%</td>
+                        <td><span class="badge badge-success">✓ Activa</span></td>
+                    </tr>
+                    <tr>
+                        <td>Favorito_Local_Forma</td>
+                        <td>78.9%</td>
+                        <td>+7.8%</td>
+                        <td><span class="badge badge-success">✓ Activa</span></td>
+                    </tr>
+                    <tr>
+                        <td>Visitante_Invicto</td>
+                        <td>56.9%</td>
+                        <td>+13.4%</td>
+                        <td><span class="badge badge-success">✓ Activa</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function testAPIs() {
+            const resultado = document.getElementById('resultado');
+            resultado.style.display = 'block';
+            resultado.innerHTML = '<p class="loading">🔄 Probando conexión con APIs...</p>';
+            
+            try {
+                const response = await fetch('/api/test-apis');
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultado.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Conexión Exitosa</h3>
+                            <p>Partidos obtenidos: ${data.partidos_obtenidos}</p>
+                            <pre>${JSON.stringify(data.estado_apis, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultado.innerHTML = `<div class="error"><h3>❌ Error</h3><p>${data.error}</p></div>`;
+                }
+            } catch (error) {
+                resultado.innerHTML = `<div class="error"><h3>❌ Error</h3><p>${error.message}</p></div>`;
+            }
+        }
+
+        async function verProximosPartidos() {
+            const resultado = document.getElementById('resultado');
+            resultado.style.display = 'block';
+            resultado.innerHTML = '<p class="loading">🔄 Obteniendo próximos partidos...</p>';
+            
+            try {
+                const response = await fetch('/api/proximos-partidos');
+                const data = await response.json();
+                
+                if (data.success && data.partidos.length > 0) {
+                    let html = '<div class="success"><h3>📅 Próximos Partidos</h3><ul>';
+                    data.partidos.forEach(p => {
+                        html += `<li><strong>${p.local} vs ${p.visitante}</strong> - ${p.fecha}</li>`;
+                    });
+                    html += '</ul></div>';
+                    resultado.innerHTML = html;
+                } else {
+                    resultado.innerHTML = '<div class="info"><p>No hay próximos partidos programados</p></div>';
+                }
+            } catch (error) {
+                resultado.innerHTML = `<div class="error"><h3>❌ Error</h3><p>${error.message}</p></div>`;
+            }
+        }
+
+        async function evaluarPartidos() {
+            const resultado = document.getElementById('resultado');
+            resultado.style.display = 'block';
+            resultado.innerHTML = '<p class="loading">🔄 Evaluando partidos contra reglas validadas...</p>';
+            
+            try {
+                const response = await fetch('/api/evaluar-partidos');
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (data.alertas > 0) {
+                        let html = '<div class="success"><h3>🎯 Alertas Generadas: ' + data.alertas + '</h3><ul>';
+                        data.detalles.forEach(a => {
+                            html += `
+                                <li>
+                                    <strong>${a.partido.local} vs ${a.partido.visitante}</strong><br>
+                                    Regla: ${a.regla} | Confianza: ${(a.confianza * 100).toFixed(1)}% | Stake: ${a.stake.toFixed(2)} unidades
+                                </li>
+                            `;
+                        });
+                        html += '</ul><p class="info-text">✉️ Se han enviado emails a marcosvalenciagarcia@gmail.com</p></div>';
+                        resultado.innerHTML = html;
+                    } else {
+                        resultado.innerHTML = '<div class="info"><p>No se encontraron oportunidades en los próximos partidos</p></div>';
+                    }
+                } else {
+                    resultado.innerHTML = `<div class="error"><h3>❌ Error</h3><p>${data.error}</p></div>`;
+                }
+            } catch (error) {
+                resultado.innerHTML = `<div class="error"><h3>❌ Error</h3><p>${error.message}</p></div>`;
+            }
+        }
+    </script>
+</body>
+</html>
+

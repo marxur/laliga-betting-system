@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - Sistema de Alertas La Liga</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ Configuración del Sistema</h1>
+            <p class="subtitle">Introduce tus credenciales</p>
+        </header>
+
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/configurar" class="active">⚙️ Configuración</a>
+            <a href="/resultados">📊 Resultados Backtest</a>
+        </nav>
+
+        <div class="config-form">
+            <form method="POST" action="/configurar">
+                <div class="form-group">
+                    <label for="api_key">🔑 API Key de API-Sports.io</label>
+                    <input type="text" id="api_key" name="api_key" placeholder="Tu API key aquí" required>
+                    <small>
+                        Obtén tu API key en: 
+                        <a href="https://dashboard.api-football.com/" target="_blank">
+                            https://dashboard.api-football.com/
+                        </a>
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_password">📧 Contraseña de Aplicación de Gmail</label>
+                    <input type="password" id="email_password" name="email_password" placeholder="Contraseña de 16 caracteres" required>
+                    <small>
+                        Genera una en: 
+                        <a href="https://myaccount.google.com/apppasswords" target="_blank">
+                            https://myaccount.google.com/apppasswords
+                        </a><br>
+                        <strong>Nota:</strong> NO uses tu contraseña normal de Gmail, debe ser una "Contraseña de Aplicación"
+                    </small>
+                </div>
+
+                <div class="info-box">
+                    <h4>ℹ️ Email Configurado</h4>
+                    <p>Las alertas se enviarán a: <strong>marcosvalenciagarcia@gmail.com</strong></p>
+                </div>
+
+                <button type="submit" class="btn btn-primary">💾 Guardar Configuración</button>
+            </form>
+        </div>
+
+        <div class="help-box">
+            <h3>❓ Ayuda</h3>
+            
+            <h4>1. ¿Cómo obtengo mi API Key de API-Sports?</h4>
+            <ol>
+                <li>Ve a <a href="https://dashboard.api-football.com/" target="_blank">dashboard.api-football.com</a></li>
+                <li>Regístrate o inicia sesión</li>
+                <li>En el dashboard, encontrarás tu API key</li>
+                <li>El plan gratuito incluye 100 requests/día</li>
+            </ol>
+
+            <h4>2. ¿Cómo genero una Contraseña de Aplicación en Gmail?</h4>
+            <ol>
+                <li>Ve a <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a></li>
+                <li>Inicia sesión con tu cuenta de Gmail</li>
+                <li>Si no tienes activada la verificación en 2 pasos, actívala primero</li>
+                <li>Selecciona "Otra (nombre personalizado)" y ponle un nombre como "Sistema Apuestas"</li>
+                <li>Google generará una contraseña de 16 caracteres</li>
+                <li>Copia esa contraseña y pégala aquí</li>
+            </ol>
+
+            <h4>3. ¿Es seguro?</h4>
+            <p>
+                Sí. Las credenciales se guardan en un archivo <code>.env</code> en el servidor y nunca se comparten.
+                La contraseña de aplicación solo permite enviar emails, no da acceso completo a tu cuenta de Gmail.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+

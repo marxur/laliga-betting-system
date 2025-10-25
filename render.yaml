@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: laliga-betting-system
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT web.app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: API_SPORTS_KEY
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+

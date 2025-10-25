@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados Backtest - Sistema de Alertas La Liga</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .markdown-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .markdown-content h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .markdown-content h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        .markdown-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .markdown-content th {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        .markdown-content td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .markdown-content tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Resultados del Backtest</h1>
+            <p class="subtitle">Análisis Histórico 2018-2025</p>
+        </header>
+
+        <nav>
+            <a href="/">Dashboard</a>
+            <a href="/configurar">⚙️ Configuración</a>
+            <a href="/resultados" class="active">📊 Resultados Backtest</a>
+        </nav>
+
+        <div class="markdown-content">
+            {{ contenido|safe }}
+        </div>
+    </div>
+</body>
+</html>
+
