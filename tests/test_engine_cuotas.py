@@ -6,6 +6,10 @@ from src.backtest.engine import BacktestEngine
 from src.rules.base import Regla
 
 
+def _cerca(a, b, tol=1e-9):
+    return abs(a - b) < tol
+
+
 def _regla(tipo):
     return Regla(
         nombre=f"siempre_{tipo}",
@@ -34,9 +38,9 @@ def test_over_usa_cuota_real_y_no_uno():
     r = resultado['siempre_Over']
     assert r['disparos'] == 1
     assert r['aciertos'] == 1
-    assert r['ganancia_total'] == 0.90
+    assert _cerca(r['ganancia_total'], 0.90)
     assert r['omitidos_sin_cuota'] == 0
-    assert r['partidos'][0]['cuota'] == 1.90
+    assert _cerca(r['partidos'][0]['cuota'], 1.90)
 
 
 def test_over_sin_cuota_no_entra_en_roi():
@@ -96,4 +100,4 @@ def test_local_pierde_resta_stake_con_cuota_real():
     assert r['disparos'] == 1
     assert r['aciertos'] == 0
     assert r['ganancia_total'] == -1.0
-    assert r['partidos'][0]['cuota'] == 1.45
+    assert _cerca(r['partidos'][0]['cuota'], 1.45)
