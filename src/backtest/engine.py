@@ -10,6 +10,7 @@ import math
 
 from src.rules.base import Regla
 from src.backtest.metrics import calcular_metricas
+from src.backtest.selector import merece_apuesta, edge as calcular_edge
 from src.config import BACKTEST_CONFIG
 
 logger = logging.getLogger(__name__)
@@ -77,11 +78,7 @@ class BacktestEngine:
         return self.resultados
 
     def ejecutar_cartera(self, verbose: bool = True) -> Dict[str, Any]:
-        """
-        Como mucho una apuesta por partido.
-        Gana la regla con mayor edge declarado (confianza x cuota - 1).
-        Si ninguna tiene edge positivo, no se apuesta.
-        """
+        """Como mucho una apuesta por partido, y solo con margen de edge."""
         aciertos = 0
         disparos = 0
         omitidos = 0
@@ -95,20 +92,16 @@ class BacktestEngine:
                 if not regla.evaluar(partido):
                     continue
                 cuota = self._obtener_cuota(partido, regla.tipo_apuesta)
-                if cuota is None:
+                if cuota is None or not merece_apuesta(regla.confianza_esperada, cuota):
                     omitidos += 1
                     continue
-                edge = regla.confianza_esperada * cuota - 1.0
+                edge = calcular_edge(regla.confianza_esperada, cuota)
                 candidatas.append((edge, regla, cuota))
 
             if not candidatas:
                 continue
             candidatas.sort(key=lambda item: item[0], reverse=True)
             edge, regla, cuota = candidatas[0]
-            if edge <= 0:
-                omitidos += 1
-                continue
-
             disparos += 1
             stake = 1.0
             stake_total += stake
@@ -164,7 +157,6 @@ class BacktestEngine:
                 omitidos += 1
                 partidos_omitidos.append({**ident, 'motivo': 'sin_cuota'})
                 continue
-
             disparos += 1
             stake = 1.0
             stake_total += stake
@@ -173,19 +165,11 @@ class BacktestEngine:
             if acerto:
                 aciertos += 1
             ganancia_total += ganancia
-            partidos_disparados.append({
-                **ident,
-                'acerto': acerto,
-                'cuota': cuota,
-                'stake': stake,
-                'ganancia': ganancia,
-            })
+            partidos_disparados.append({**ident, 'acerto': acerto, 'cuota': cuota, 'stake': stake, 'ganancia': ganancia})
 
         metricas = calcular_metricas(aciertos, disparos, ganancia_total, stake_total)
         metricas['omitidos_sin_cuota'] = omitidos
-        metricas['max_drawdown'] = _max_drawdown(
-            [p['ganancia'] for p in partidos_disparados]
-        )
+        metricas['max_drawdown'] = _max_drawdown([p['ganancia'] for p in partidos_disparados])
         metricas['partidos'] = partidos_disparados
         metricas['partidos_omitidos'] = partidos_omitidos
         return metricas
