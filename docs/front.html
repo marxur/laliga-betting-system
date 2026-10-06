@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>La Liga · backtest</title>
+<title>La Liga · cartera filtrada</title>
 <style>
   :root { color-scheme: dark; }
   body { margin: 0; font-family: Georgia, serif; background: #12140f; color: #f4f1e8; }
@@ -24,28 +24,26 @@
 </head>
 <body>
 <main>
-  <h1>La Liga, motor actual</h1>
-  <p class="lead">Auditoría del 7 de octubre de 2026. 2660 partidos de football-data.co.uk. Train hasta 2023, test 2024-2025.</p>
+  <h1>La Liga, filtro de valor</h1>
+  <p class="lead">Actualizado el 7 de octubre de 2026. Solo entra una apuesta si el acierto de train supera la cuota en al menos 4 puntos de edge y la regla no perdió en train.</p>
   <div class="grid">
-    <div class="card">Partidos<b>2660</b></div>
-    <div class="card">Cartera test<b>75/136</b></div>
-    <div class="card">ROI cartera<b>+2,9 %</b></div>
+    <div class="card">Cartera filtrada<b>39/75</b></div>
+    <div class="card">ROI test<b>−5,5 %</b></div>
+    <div class="card">Caída<b>10,9 u</b></div>
   </div>
   <table>
-    <thead><tr><th>Regla</th><th>Test</th><th>ROI</th><th>Edge</th></tr></thead>
+    <thead><tr><th>Política</th><th>Test</th><th>ROI</th><th>Edge</th></tr></thead>
     <tbody>
-      <tr><td>Favorito local en forma</td><td>60/76</td><td>+7,8 %</td><td class="no">no, p=0,14</td></tr>
-      <tr><td>Visitante con racha</td><td>56/93</td><td>+8,6 %</td><td class="no">no, p=0,15</td></tr>
-      <tr><td>Local invicto favorito</td><td>36/45</td><td>+2,7 %</td><td class="no">no, p=0,34</td></tr>
-      <tr><td>Visitante invicto</td><td>43/84</td><td>+1,0 %</td><td class="no">no, p=0,55</td></tr>
-      <tr><td>Over 2,5 ofensivo</td><td>49/96</td><td>−19,8 %</td><td class="no">no</td></tr>
-      <tr><td>BTTS</td><td>0</td><td>—</td><td class="no">sin cuota</td></tr>
+      <tr><td>Sin margen mínimo</td><td>75/136</td><td>+2,9 %</td><td class="no">no, p=0,41</td></tr>
+      <tr><td>Margen de 4 puntos</td><td>39/75</td><td>−5,5 %</td><td class="no">no, p=0,71</td></tr>
+      <tr><td>2024, filtrada</td><td>22/45</td><td>−6,03 u</td><td class="no">pierde</td></tr>
+      <tr><td>2025, filtrada</td><td>17/30</td><td>+1,92 u</td><td class="no">muestra corta</td></tr>
     </tbody>
   </table>
   <div class="warn">
-    Ninguna regla está validada. La cartera gana 3,94 unidades y cae 8,94. El 80 % de acierto a cuota baja no es ventaja: el mercado ya lo descontaba. Las cifras viejas del README (+13,4 %, ROI anual 9,5 %) no salen de este motor.
+    Apretar el filtro no descubre una ventaja: borra el +2,9 % anterior. Over 2,5 sigue en −19,8 % y queda fuera. BTTS no tiene cuota en los CSV. Ninguna regla está validada para apostar.
   </div>
-  <p>Informe completo: <a href="https://github.com/marxur/laliga-betting-system/blob/main/outputs/reports/backtest_actual.md">backtest_actual.md</a></p>
+  <p>Informe: <a href="https://github.com/marxur/laliga-betting-system/blob/main/outputs/reports/backtest_actual.md">backtest_actual.md</a></p>
 </main>
 </body>
 </html>
