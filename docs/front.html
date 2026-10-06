@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Liga · backtest</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font-family: Georgia, serif; background: #12140f; color: #f4f1e8; }
+  main { max-width: 720px; margin: 0 auto; padding: 28px 18px 64px; }
+  h1 { font-weight: 500; font-size: 1.8rem; margin-bottom: 0.2rem; }
+  p.lead { color: #c8c2b4; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .card { background: #1c1f18; border: 1px solid #34382e; padding: 14px; }
+  .card b { display: block; font-size: 1.3rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #34382e; }
+  th { color: #b7b29a; font-weight: 500; }
+  .no { color: #e2b3a2; }
+  .warn { background: #2a2418; border: 1px solid #6d5a32; padding: 14px; margin-top: 22px; }
+  a { color: #e6d7a8; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>La Liga, motor actual</h1>
+  <p class="lead">Auditoría del 7 de octubre de 2026. 2660 partidos de football-data.co.uk. Train hasta 2023, test 2024-2025.</p>
+  <div class="grid">
+    <div class="card">Partidos<b>2660</b></div>
+    <div class="card">Cartera test<b>75/136</b></div>
+    <div class="card">ROI cartera<b>+2,9 %</b></div>
+  </div>
+  <table>
+    <thead><tr><th>Regla</th><th>Test</th><th>ROI</th><th>Edge</th></tr></thead>
+    <tbody>
+      <tr><td>Favorito local en forma</td><td>60/76</td><td>+7,8 %</td><td class="no">no, p=0,14</td></tr>
+      <tr><td>Visitante con racha</td><td>56/93</td><td>+8,6 %</td><td class="no">no, p=0,15</td></tr>
+      <tr><td>Local invicto favorito</td><td>36/45</td><td>+2,7 %</td><td class="no">no, p=0,34</td></tr>
+      <tr><td>Visitante invicto</td><td>43/84</td><td>+1,0 %</td><td class="no">no, p=0,55</td></tr>
+      <tr><td>Over 2,5 ofensivo</td><td>49/96</td><td>−19,8 %</td><td class="no">no</td></tr>
+      <tr><td>BTTS</td><td>0</td><td>—</td><td class="no">sin cuota</td></tr>
+    </tbody>
+  </table>
+  <div class="warn">
+    Ninguna regla está validada. La cartera gana 3,94 unidades y cae 8,94. El 80 % de acierto a cuota baja no es ventaja: el mercado ya lo descontaba. Las cifras viejas del README (+13,4 %, ROI anual 9,5 %) no salen de este motor.
+  </div>
+  <p>Informe completo: <a href="https://github.com/marxur/laliga-betting-system/blob/main/outputs/reports/backtest_actual.md">backtest_actual.md</a></p>
+</main>
+</body>
+</html>
