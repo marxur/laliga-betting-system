@@ -19,7 +19,6 @@ def _liga_minima():
 
 def test_derrotas_no_cuentan_el_partido_actual():
     df = FeatureEngineer().generar_todas_features(_liga_minima())
-    # A gana, pierde y gana antes del 22-ene. Derrotas previas = 1, no 1+resultado actual.
     ultimo = df[df['Date'] == '2024-01-22'].iloc[0]
     assert ultimo['Local_Derrotas_L3'] == 1
     assert ultimo['Local_Victorias_L3'] == 2
@@ -42,7 +41,6 @@ def test_btts_historico_no_incluye_el_partido():
 def test_edge_no_sale_de_ganar_favoritos_al_azar_de_la_cuota():
     partidos = [{'acerto': True, 'cuota': 1.50} for _ in range(60)]
     partidos += [{'acerto': False, 'cuota': 1.50} for _ in range(40)]
-    # 60 % de acierto con cuota 1.50 (implícita 66.7 %) no es edge.
     sig = DataValidator().validar_contra_cuota(partidos)
     assert sig['significativo'] is False
     assert sig['esperados'] > sig['aciertos']
@@ -55,9 +53,10 @@ def test_cartera_una_apuesta_por_partido():
             'Cuota_Local': 1.40, 'Cuota_Visitante': 6.0,
         }
     ])
+    # Edge local = 0.90*1.40-1 = 0.26. Edge visitante = 0.10*6-1 = -0.40.
     reglas = [
-        Regla('local', 'l', lambda p: True, 'Local', 0.80, True),
-        Regla('visitante', 'v', lambda p: True, 'Visitante', 0.20, True),
+        Regla('local', 'l', lambda p: True, 'Local', 0.90, True),
+        Regla('visitante', 'v', lambda p: True, 'Visitante', 0.10, True),
     ]
     cartera = BacktestEngine(df, reglas).ejecutar_cartera(verbose=False)
     assert cartera['disparos'] == 1
