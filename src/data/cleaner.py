@@ -1,6 +1,6 @@
 """
-Limpieza y estandarización de datos
-Responsabilidad: Transformar datos crudos en formato consistente
+Limpieza y estandarización de datos.
+No crea columnas duplicadas si dos fuentes de cuota comparten destino.
 """
 
 import pandas as pd
@@ -10,47 +10,23 @@ logger = logging.getLogger(__name__)
 
 
 class DataCleaner:
-    """Limpia y estandariza datos de football-data.co.uk"""
+    """Limpia y estandariza datos de football-data.co.uk."""
 
     @staticmethod
     def limpiar(df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Pipeline completo de limpieza
-
-        Args:
-            df: DataFrame crudo
-
-        Returns:
-            DataFrame limpio y estandarizado
-        """
         df = df.copy()
-
-        # 1. Convertir fechas
-        df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y', errors='coerce')
-
-        # 2. Filtrar partidos incompletos
-        columnas_requeridas = ['FTHG', 'FTAG', 'FTR']
-        df = df.dropna(subset=columnas_requeridas)
-
-        # 3. Ordenar cronológicamente (CRÍTICO para backtest)
+        df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
+        df = df.dropna(subset=['Date'])
+        df = df.dropna(subset=['FTHG', 'FTAG', 'FTR'])
         df = df.sort_values('Date').reset_index(drop=True)
-
-        # 4. Renombrar columnas a español estándar
         df = DataCleaner._renombrar_columnas(df)
-
-        # 5. Validar tipos de datos
         df = DataCleaner._validar_tipos(df)
-
-        # 6. Añadir metadata útil
-        df = DataCleaner._añadir_metadata(df)
-
+        df = DataCleaner._anadir_metadata(df)
         logger.info(f"Datos limpiados: {len(df)} partidos válidos")
-
         return df
 
     @staticmethod
     def _renombrar_columnas(df: pd.DataFrame) -> pd.DataFrame:
-        """Renombra columnas a nombres estándar."""
         renombrado = {
             'HomeTeam': 'Local',
             'AwayTeam': 'Visitante',
@@ -67,7 +43,6 @@ class DataCleaner:
             'AS': 'Tiros_Visitante',
             'HST': 'Tiros_Puerta_Local',
             'AST': 'Tiros_Puerta_Visitante',
-            # Over/Under 2.5. Sin esto el motor no puede liquidar Over.
             'B365>2.5': 'Cuota_Over_25',
             'B365<2.5': 'Cuota_Under_25',
             'Avg>2.5': 'Cuota_Over_25_Avg',
@@ -78,42 +53,47 @@ class DataCleaner:
             'Max<2.5': 'Cuota_Under_25_Max',
             'P>2.5': 'Cuota_Over_25_Pinnacle',
             'P<2.5': 'Cuota_Under_25_Pinnacle',
+            'B365CH': 'Cuota_Local_Cierre',
+            'B365CD': 'Cuota_Empate_Cierre',
+            'B365CA': 'Cuota_Visitante_Cierre',
+            'B365C>2.5': 'Cuota_Over_25_Cierre',
+            'B365C<2.5': 'Cuota_Under_25_Cierre',
         }
-
-        renombrado = {k: v for k, v in renombrado.items() if k in df.columns}
-        return df.rename(columns=renombrado)
+        out = df.copy()
+        for src, dst in renombrado.items():
+            if src not in out.columns:
+                continue
+            if dst in out.columns:
+                out = out.drop(columns=[src])
+                continue
+            out = out.rename(columns={src: dst})
+        return out
 
     @staticmethod
     def _validar_tipos(df: pd.DataFrame) -> pd.DataFrame:
-        """Asegura tipos de datos correctos."""
-        columnas_goles = ['Goles_Local', 'Goles_Visitante']
-        for col in columnas_goles:
+        for col in ('Goles_Local', 'Goles_Visitante'):
             if col in df.columns:
                 df[col] = df[col].astype(int)
-
         columnas_cuotas = [
-            'Cuota_Local',
-            'Cuota_Empate',
-            'Cuota_Visitante',
-            'Cuota_Over_25',
-            'Cuota_Under_25',
-            'Cuota_Over_25_Avg',
-            'Cuota_Under_25_Avg',
-            'Cuota_Over_25_Max',
-            'Cuota_Under_25_Max',
-            'Cuota_Over_25_Pinnacle',
-            'Cuota_Under_25_Pinnacle',
-            'Cuota_BTTS',
+            'Cuota_Local', 'Cuota_Empate', 'Cuota_Visitante',
+            'Cuota_Over_25', 'Cuota_Under_25',
+            'Cuota_Over_25_Avg', 'Cuota_Under_25_Avg',
+            'Cuota_Over_25_Max', 'Cuota_Under_25_Max',
+            'Cuota_Over_25_Pinnacle', 'Cuota_Under_25_Pinnacle',
+            'Cuota_Local_Cierre', 'Cuota_Empate_Cierre', 'Cuota_Visitante_Cierre',
+            'Cuota_Over_25_Cierre', 'Cuota_Under_25_Cierre', 'Cuota_BTTS',
         ]
         for col in columnas_cuotas:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce')
-
+            if col not in df.columns:
+                continue
+            serie = df[col]
+            if isinstance(serie, pd.DataFrame):
+                serie = serie.iloc[:, 0]
+            df[col] = pd.to_numeric(serie, errors='coerce')
         return df
 
     @staticmethod
-    def _añadir_metadata(df: pd.DataFrame) -> pd.DataFrame:
-        """Añade columnas de metadata útil."""
+    def _anadir_metadata(df: pd.DataFrame) -> pd.DataFrame:
         df['Año'] = df['Date'].dt.year
         df['Mes'] = df['Date'].dt.month
         df['Dia_Semana'] = df['Date'].dt.dayofweek
